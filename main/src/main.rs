@@ -1,3 +1,4 @@
+//#[derive(Debug)]
 struct Produto
 {
     nome: String,
@@ -17,9 +18,10 @@ fn new_produto(nome:String) -> Produto
 
 fn main()
 {
-    //let mut ts: [Produto;1] = [];
-
-    let test = new_produto(String::from("Tss"));
+    let mut ts = Vec::new();
     
-    println!("{}",test.nome);
+    ts.push(new_produto(String::from("MA")));
+    
+    let ts1 = &ts[0];
+    println!("{}", ts1.nome);
 }
