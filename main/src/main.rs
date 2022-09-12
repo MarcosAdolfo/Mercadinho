@@ -35,24 +35,25 @@ fn new_produto() -> Produto
 
 }
 
-fn create_produto(produto_list:&[Produto])
+fn produtos(produto_list:&mut [Produto]) -> bool
 {
     loop
     {
         let mut alternativa = String::new();
 
-        println!("0) - Sai");
-        println!("1) - Cadastra Novo Produto");
-        println!("2) - Listar Produtos");
+        println!("-----------Produto-----------");
+        println!("Escolha uma opção");
+        println!("1) - lista produtos\n2) - Modifica um Produto\n3) - Criar novo Produto\n0) - Sai");
 
         io::stdin().read_line(&mut alternativa).expect("Failed to read line");
         let mut alternativa = alternativa.trim().parse::<u8>().expect("ERRO: Falha na conversão");
 
         match alternativa
         {
-            0 => break,
-           // 1 => &produto_list.push(new_produto()),
-            2 => listar_produto(&produto_list),
+            0 => return false,
+            1 => listar_produto(&produto_list),
+            //2 => ,
+            3 => return true,
             _ => continue,
         }
     }  
@@ -61,15 +62,24 @@ fn create_produto(produto_list:&[Produto])
 fn listar_produto(list: &[Produto])
 {
     println!("| N° | ID |       NOME        | VALOR UNITÁRIO | LUCRO % | VALOR + LUCRO | ESTOQUE |");
+    
     for p in list
     {
-        println!("-> {}  R$ {}!!!", p.nome.trim(), p.valor);
-    }
+        println!("| N° | ID |       {}      | R$ {} | Lucro % | VL | {} |", p.nome.trim(), p.valor, p.estoque);
+    } 
 }
 
 fn add_estoque(produto_list:&mut [Produto], index_produto:usize)
 {
-    produto_list[index_produto].estoque += 1;
+    if produto_list.len() > 0
+    {
+        produto_list[index_produto].estoque += 1;
+    }
+    else
+    {
+        println!("Não a produtos cadastrados ainda");
+    }
+
 }
 
 fn estoque_interface(produto_list:&mut [Produto])
@@ -92,6 +102,7 @@ fn estoque_interface(produto_list:&mut [Produto])
         {
             0 => break,
             1 => add_estoque(produto_list, 0),
+            //2 => ,
             _=>{println!("opção invalida!"); continue},
         }
     }
@@ -116,7 +127,15 @@ fn main()
         match opcao
         {
             0 => break,
+            //1 => ,
             2 => estoque_interface(&mut produto_list),
+            3 => 
+            {
+                if produtos(&mut produto_list)
+                {
+                    produto_list.push(new_produto());
+                }
+            },
             _=>{println!("opção invalida!"); continue},
         }
     }
