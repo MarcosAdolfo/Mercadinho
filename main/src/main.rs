@@ -8,11 +8,20 @@ struct Produto
     
 }
 
+impl Produto
+{
+    fn add_estoque(&mut self, valor:u16)
+    {
+        self.estoque += valor;
+    }
+}
+
 fn new_produto() -> Produto
 {
     println!("Nome do Produto");
     let mut nome:String = String::new();
     io::stdin().read_line(&mut nome).expect("Failed to read line");
+    let mut nome = nome.to_uppercase();
     
     println!("Valor do Produto");
     let mut valor = String::new();
@@ -72,19 +81,6 @@ fn listar_produto(list: &[Produto])
     } 
 }
 
-fn add_estoque(produto_list:&mut [Produto], index_produto:usize, valor:u16)
-{
-    if produto_list.len() > 0
-    {
-        produto_list[index_produto].estoque += valor;
-    }
-    else
-    {
-        println!("Não a produtos cadastrados ainda");
-    }
-
-}
-
 fn add_estoque_interface(produto_list:&mut [Produto])
 {
     let mut valor = String::new();
@@ -116,7 +112,8 @@ fn add_estoque_interface(produto_list:&mut [Produto])
     io::stdin().read_line(&mut valor).expect("Failed to read line");
     let valor = valor.trim().parse::<u16>().expect("ERRO: Falha na conversão");
 
-    add_estoque(produto_list, index_produto, valor);
+    produto_list[index_produto].add_estoque(valor);
+    
 }
 
 fn estoque_interface(produto_list:&mut [Produto])
@@ -178,3 +175,4 @@ fn main()
     }
 
 }
+// dividi string -> split_whitespace()
