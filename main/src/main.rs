@@ -1,10 +1,16 @@
 use std::io;
+use std::fmt::Display;
+use rand::Rng;
+use std::collections::HashMap;
+
+extern crate rand;
 //#[derive(Debug)]
 struct Produto
 {
     nome: String,
     valor: f64,
     estoque: u16,
+    id: u16,
     
 }
 
@@ -33,18 +39,21 @@ fn new_produto() -> Produto
     io::stdin().read_line(&mut estoque).expect("Failed to read line");
     let mut estoque = estoque.trim().parse::<u16>().expect("ERRO: Falha na conversão");
 
-    let produto = Produto
+    let id: u16 = rand::thread_rng().gen_range(1000..=9999);
+
+    let produto:Produto = Produto
     {
         nome,
         valor,
         estoque,
+        id,
     };
     
     produto
 
 }
 
-fn produtos(produto_list:&mut [Produto]) -> bool
+fn produtos(produto_list:&mut HashMap<u16, Produto>) -> bool
 {
     loop
     {
@@ -60,7 +69,7 @@ fn produtos(produto_list:&mut [Produto]) -> bool
         match alternativa
         {
             0 => return false,
-            1 => listar_produto(&produto_list),
+            1 => listar_produto(produto_list),
             //2 => ,
             3 => return true,
             _ => continue,
@@ -68,63 +77,118 @@ fn produtos(produto_list:&mut [Produto]) -> bool
     }  
 }
 
-fn listar_produto(list: &[Produto])
+fn listar_produto(list: &mut HashMap<u16, Produto>)
 {
     let mut num:u16 = 0;
 
     println!("| N° | ID |       NOME        | VALOR UNITÁRIO | LUCRO % | VALOR + LUCRO | ESTOQUE |");
     
-    for p in list
+    for (k,p) in list
     {
         num += 1;
-        println!("| {}° | ID |       {}      | R$ {} | Lucro % | VL | {} |", num, p.nome.trim(), p.valor, p.estoque);
+        println!("| {}° | {} |...{}...R$ {}...Lucro %...VL...{} |", num, p.id, p.nome.trim(), p.valor, p.estoque);
     } 
 }
 
-fn add_estoque_interface(produto_list:&mut [Produto])
+fn buscar_produto(produto_biblioteca: &HashMap<u16, Produto>) -> u16
 {
-    let mut valor = String::new();
-    let mut index_produto : usize = 0;
+    println!("Pesquisa por Produtos - ( 0 ) Para Sair");
 
-    index_produto = loop 
+    loop
     {
-        let mut produto_idx = String::new();
+        println!("Nome do Produtos: ");
+        
+        let mut pesquisa:String = String::new();
+        io::stdin().read_line(&mut pesquisa).expect("Error reading pesquisa");
+        let pesquisa = pesquisa.to_uppercase();
+        
+        if pesquisa.trim() == "0"{break 0;}
+        
+        let pesquisa: Vec<&str> = pesquisa.trim().split_whitespace().collect();
+        
+        let mut num:u16 = 0;
+        
+        let mut resut_pesquisa:Vec<u16> = Vec::new();
 
-        println!("Escolha um produto para adicionar mais estoque\nEscolha o N° do respectivo produto");
-    
-        io::stdin().read_line(&mut produto_idx).expect("Failed to read line");
-        let mut produto_idx = produto_idx.trim().parse::<usize>().expect("ERRO: Falha na conversão");
-
-        if produto_idx != 0 {produto_idx -= 1;}
-
-        if produto_idx < produto_list.len()
+        for (k, produto) in produto_biblioteca
         {
-            break produto_idx;
+            let produto_nomes: Vec<&str> = produto.nome.trim().split(' ').collect();
+            
+            let mut comparacao_nome_produto:bool = false;
+
+            for nome_pesquisa in &pesquisa
+            {
+                for nome in &produto_nomes
+                {
+                    if &nome_pesquisa == &nome
+                    {
+                        comparacao_nome_produto = true;
+                        num += 1;
+                        println!("{}) {} - > {} ", num, k, produto.nome);
+                        resut_pesquisa.push(produto.id);
+                        break;
+                    }
+                }
+                if comparacao_nome_produto { break };
+            }
         }
-        else
-        {
-            println!("Escolha uma opção valida");
-        }
-    };
-
-    println!("Valor:");
-
-    io::stdin().read_line(&mut valor).expect("Failed to read line");
-    let valor = valor.trim().parse::<u16>().expect("ERRO: Falha na conversão");
-
-    produto_list[index_produto].add_estoque(valor);
     
+        if resut_pesquisa.len() > 0
+        {
+            loop 
+            {
+                println!("Escolha um produto(N°):");
+        
+                let mut opcao_pesquisa = String::new();
+                io::stdin().read_line(&mut opcao_pesquisa).expect("Failed to read line");
+                let opcao_pesquisa = opcao_pesquisa.trim().parse::<usize>().expect("Failed to parse");
+
+                if opcao_pesquisa <= resut_pesquisa.len() && opcao_pesquisa > 0
+                {
+                    return resut_pesquisa[opcao_pesquisa-1]
+                }
+                else if opcao_pesquisa == 0 {break;}
+            }
+        }
+    }
 }
 
-fn estoque_interface(produto_list:&mut [Produto])
+fn add_estoque_interface(produto_biblioteca: &mut HashMap<u16, Produto>)
+{
+    let mut valor = String::new();
+    let mut chave_produto : u16 = 0;
+
+    println!("\nEscolha um produto para adicionar mais estoque");
+    
+    chave_produto = buscar_produto(&produto_biblioteca);
+
+    if chave_produto > 0
+    {
+        println!("\nValor:");
+    
+        io::stdin().read_line(&mut valor).expect("Failed to read line");
+        let valor = valor.trim().parse::<u16>().expect("ERRO: Falha na conversão");
+    
+        //let produto = produto_biblioteca.get(&chave_produto);
+        //let mut produto = produto.add_estoque(valor);
+    
+        for (k, produto) in produto_biblioteca
+        {
+            if k == &chave_produto{produto.add_estoque(valor)}
+        }
+        //produto_biblioteca.get(&chave_produto).expect("ERRO:Falha").add_estoque(valor);
+    }
+}
+
+fn estoque_interface(produto_biblioteca: &mut HashMap<u16, Produto>)
 {
     loop 
     {      
         let mut opcao:String = String::new();
     
-        println!("------------Estoque------------");
+        println!("\n------------Estoque------------");
     
-        listar_produto(&produto_list);
+        listar_produto(produto_biblioteca);
     
         println!("Escolha uma opção");
         println!("1) ADD Estoque\n2) Altera Estoque\n0) Sair");
@@ -135,7 +199,7 @@ fn estoque_interface(produto_list:&mut [Produto])
         match opcao
         {
             0 => break,
-            1 => add_estoque_interface(produto_list),
+            1 => add_estoque_interface(produto_biblioteca),
             //2 => ,
             _=>{println!("opção invalida!"); continue},
         }
@@ -145,6 +209,7 @@ fn estoque_interface(produto_list:&mut [Produto])
 fn main()
 {
     let mut produto_list:Vec<Produto> = Vec::new();
+    let mut produto_biblioteca:HashMap<u16,Produto>= HashMap::new();
 
     loop
     {
@@ -162,12 +227,14 @@ fn main()
         {
             0 => break,
             //1 => ,
-            2 => estoque_interface(&mut produto_list),
+            2 => estoque_interface(&mut produto_biblioteca),
             3 => 
             {
-                if produtos(&mut produto_list)
+                if produtos(&mut produto_biblioteca)
                 {
-                    produto_list.push(new_produto());
+                    //produto_list.push(new_produto());
+                    let produto = new_produto();
+                    produto_biblioteca.insert(produto.id,produto);
                 }
             },
             _=>{println!("opção invalida!"); continue},
