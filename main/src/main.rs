@@ -1,5 +1,5 @@
 use std::io;
-use std::fmt::Display;
+//use std::fmt::Display;
 use rand::Rng;
 use std::collections::HashMap;
 
@@ -27,17 +27,17 @@ fn new_produto() -> Produto
     println!("Nome do Produto");
     let mut nome:String = String::new();
     io::stdin().read_line(&mut nome).expect("Failed to read line");
-    let mut nome = nome.to_uppercase();
+    let nome = nome.to_uppercase();
     
     println!("Valor do Produto");
     let mut valor = String::new();
     io::stdin().read_line(&mut valor).expect("Failed to read line");
-    let mut valor = valor.trim().parse::<f64>().expect("ERRO: Falha na conversão");
+    let valor = valor.trim().parse::<f64>().expect("ERRO: Falha na conversão");
 
     println!("Estoque inicial do produto");
     let mut estoque = String::new();
     io::stdin().read_line(&mut estoque).expect("Failed to read line");
-    let mut estoque = estoque.trim().parse::<u16>().expect("ERRO: Falha na conversão");
+    let estoque = estoque.trim().parse::<u16>().expect("ERRO: Falha na conversão");
 
     let id: u16 = rand::thread_rng().gen_range(1000..=9999);
 
@@ -64,7 +64,7 @@ fn produtos(produto_list:&mut HashMap<u16, Produto>) -> bool
         println!("1) - lista produtos\n2) - Modifica um Produto\n3) - Criar novo Produto\n0) - Sai");
 
         io::stdin().read_line(&mut alternativa).expect("Failed to read line");
-        let mut alternativa = alternativa.trim().parse::<u8>().expect("ERRO: Falha na conversão");
+        let alternativa = alternativa.trim().parse::<u8>().expect("ERRO: Falha na conversão");
 
         match alternativa
         {
@@ -83,7 +83,7 @@ fn listar_produto(list: &mut HashMap<u16, Produto>)
 
     println!("| N° | ID |       NOME        | VALOR UNITÁRIO | LUCRO % | VALOR + LUCRO | ESTOQUE |");
     
-    for (k,p) in list
+    for (_k,p) in list
     {
         num += 1;
         println!("| {}° | {} |...{}...R$ {}...Lucro %...VL...{} |", num, p.id, p.nome.trim(), p.valor, p.estoque);
@@ -148,19 +148,19 @@ fn buscar_produto(produto_biblioteca: &HashMap<u16, Produto>) -> u16
                     return resut_pesquisa[opcao_pesquisa-1]
                 }
                 else if opcao_pesquisa == 0 {break;}
+                else{println!("\nOpção Invalida!\nDigite Novamente.");}
             }
-        }
+        }else{println!("\nProduto não encontrado!!!\n");}
     }
 }
 
 fn add_estoque_interface(produto_biblioteca: &mut HashMap<u16, Produto>)
 {
     let mut valor = String::new();
-    let mut chave_produto : u16 = 0;
 
     println!("\nEscolha um produto para adicionar mais estoque");
     
-    chave_produto = buscar_produto(&produto_biblioteca);
+    let chave_produto:u16 = buscar_produto(&produto_biblioteca);
 
     if chave_produto > 0
     {
@@ -208,7 +208,7 @@ fn estoque_interface(produto_biblioteca: &mut HashMap<u16, Produto>)
 
 fn main()
 {
-    let mut produto_list:Vec<Produto> = Vec::new();
+    //let mut produto_list:Vec<Produto> = Vec::new();
     let mut produto_biblioteca:HashMap<u16,Produto>= HashMap::new();
 
     loop
