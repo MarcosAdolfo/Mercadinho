@@ -53,7 +53,7 @@ fn new_produto() -> Produto
 
 }
 
-fn produtos(produto_list:&mut HashMap<u16, Produto>) -> bool
+fn produtos(produto_biblioteca:&mut HashMap<u16, Produto>)
 {
     loop
     {
@@ -68,22 +68,26 @@ fn produtos(produto_list:&mut HashMap<u16, Produto>) -> bool
 
         match alternativa
         {
-            0 => return false,
-            1 => listar_produto(produto_list),
+            0 => break,
+            1 => listar_produto(produto_biblioteca),
             //2 => ,
-            3 => return true,
+            3 => 
+            {
+                let produto = new_produto();
+                produto_biblioteca.insert(produto.id,produto);
+            },
             _ => continue,
         }
-    }  
+    }
 }
 
-fn listar_produto(list: &mut HashMap<u16, Produto>)
+fn listar_produto(produto_biblioteca: &mut HashMap<u16, Produto>)
 {
     let mut num:u16 = 0;
 
     println!("| N° | ID |       NOME        | VALOR UNITÁRIO | LUCRO % | VALOR + LUCRO | ESTOQUE |");
     
-    for (_k,p) in list
+    for (_k,p) in produto_biblioteca
     {
         num += 1;
         println!("| {}° | {} |...{}...R$ {}...Lucro %...VL...{} |", num, p.id, p.nome.trim(), p.valor, p.estoque);
@@ -156,8 +160,6 @@ fn buscar_produto(produto_biblioteca: &HashMap<u16, Produto>) -> u16
 
 fn add_estoque_interface(produto_biblioteca: &mut HashMap<u16, Produto>)
 {
-    let mut valor = String::new();
-
     println!("\nEscolha um produto para adicionar mais estoque");
     
     let chave_produto:u16 = buscar_produto(&produto_biblioteca);
@@ -165,12 +167,13 @@ fn add_estoque_interface(produto_biblioteca: &mut HashMap<u16, Produto>)
     if chave_produto > 0
     {
         println!("\nValor:");
-    
+
+        let mut valor = String::new();
         io::stdin().read_line(&mut valor).expect("Failed to read line");
-        let valor = valor.trim().parse::<u16>().expect("ERRO: Falha na conversão");
+        let valor:u16 = valor.trim().parse::<u16>().expect("ERRO: Falha na conversão");
     
-        //let produto = produto_biblioteca.get(&chave_produto);
-        //let mut produto = produto.add_estoque(valor);
+        //let test = produto_biblioteca.get(&chave_produto).expect("ERRO:");
+        //test.add_estoque(valor);
     
         for (k, produto) in produto_biblioteca
         {
@@ -228,15 +231,7 @@ fn main()
             0 => break,
             //1 => ,
             2 => estoque_interface(&mut produto_biblioteca),
-            3 => 
-            {
-                if produtos(&mut produto_biblioteca)
-                {
-                    //produto_list.push(new_produto());
-                    let produto = new_produto();
-                    produto_biblioteca.insert(produto.id,produto);
-                }
-            },
+            3 => produtos(&mut produto_biblioteca),
             _=>{println!("opção invalida!"); continue},
         }
     }
