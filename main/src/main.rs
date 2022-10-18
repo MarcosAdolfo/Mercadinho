@@ -4,14 +4,15 @@ use rand::Rng;
 use std::collections::HashMap;
 
 extern crate rand;
+
 //#[derive(Debug)]
 struct Produto
 {
     nome: String,
     valor: f64,
+    lucro: f64,
     estoque: u16,
     id: u16,
-    
 }
 
 impl Produto
@@ -19,6 +20,11 @@ impl Produto
     fn add_estoque(&mut self, valor:u16)
     {
         self.estoque += valor;
+    }
+
+    fn calc_preco(&self) -> f64
+    {
+        ((self.lucro / 100.0) * self.valor) + self.valor
     }
 }
 
@@ -34,6 +40,11 @@ fn new_produto() -> Produto
     io::stdin().read_line(&mut valor).expect("Failed to read line");
     let valor = valor.trim().parse::<f64>().expect("ERRO: Falha na conversão");
 
+    println!("Margem De Lucro %");
+    let mut lucro:String = String::new();
+    io::stdin().read_line(&mut lucro).expect("Failed to read line");
+    let lucro = lucro.trim().parse::<f64>().expect("ERRO:Falha na conversão");
+
     println!("Estoque inicial do produto");
     let mut estoque = String::new();
     io::stdin().read_line(&mut estoque).expect("Failed to read line");
@@ -45,10 +56,11 @@ fn new_produto() -> Produto
     {
         nome,
         valor,
+        lucro,
         estoque,
         id,
     };
-    
+
     produto
 
 }
@@ -85,12 +97,12 @@ fn listar_produto(produto_biblioteca: &mut HashMap<u16, Produto>)
 {
     let mut num:u16 = 0;
 
-    println!("| N° | ID |       NOME        | VALOR UNITÁRIO | LUCRO % | VALOR + LUCRO | ESTOQUE |");
+    println!("| N° |  ID  |       NOME        | VALOR UNITÁRIO | Margem De Lucro % | PREÇO UNITÁRIO | ESTOQUE |");
     
     for (_k,p) in produto_biblioteca
     {
         num += 1;
-        println!("| {}° | {} |...{}...R$ {}...Lucro %...VL...{} |", num, p.id, p.nome.trim(), p.valor, p.estoque);
+        println!("| {}° | {} |    {}    |   R$ {:.2}   |   {}%   |    R$ {:.2}    |  {}  |", num, p.id, p.nome.trim(), p.valor, p.lucro, p.calc_preco(), p.estoque);
     } 
 }
 
