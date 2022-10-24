@@ -82,7 +82,7 @@ fn produtos(produto_biblioteca:&mut HashMap<u16, Produto>)
         {
             0 => break,
             1 => listar_produto(produto_biblioteca),
-            //2 => ,
+            2 => modifica_produto(produto_biblioteca),
             3 => 
             {
                 let produto = new_produto();
@@ -170,6 +170,33 @@ fn buscar_produto(produto_biblioteca: &HashMap<u16, Produto>) -> u16
     }
 }
 
+fn modifica_produto(produto_biblioteca: &mut HashMap<u16, Produto>)
+{
+    println!("\nEscolha um produto para Modifica");
+
+    let chave_produto:u16 = buscar_produto(&produto_biblioteca);
+
+    while chave_produto > 0
+    {
+        println!("Qual campo gostaria de altera");
+        println!("1) - NOME \n2) - VALOR UNITÁRIO \n3) - Margem De Lucro % \n4) - ESTOQUE \n0) - Sair ");
+
+        let mut opcao = String::new();
+        io::stdin().read_line(&mut opcao).expect("Failed to read line");
+        let opcao:u16 = opcao.trim().parse::<u16>().expect("ERRO: Falha na conversão");
+
+        match opcao
+        {
+            0 => break,
+            1 => break,
+            2 => break,
+            3 => break,
+            4 => break,
+            _=> println!("opção invalida!"),
+        }
+    }
+}
+
 fn add_estoque_interface(produto_biblioteca: &mut HashMap<u16, Produto>)
 {
     println!("\nEscolha um produto para adicionar mais estoque");
@@ -206,7 +233,7 @@ fn estoque_interface(produto_biblioteca: &mut HashMap<u16, Produto>)
         listar_produto(produto_biblioteca);
     
         println!("Escolha uma opção");
-        println!("1) ADD Estoque\n2) Altera Estoque\n0) Sair");
+        println!("1) - ADD Estoque\n2) - Altera Estoque\n0) - Sair");
     
         io::stdin().read_line(&mut opcao).expect("Failed to read line");
         let opcao = opcao.trim().parse::<u8>().expect("ERRO: Falha na conversão");
@@ -232,7 +259,7 @@ fn main()
 
         println!("------------Mercadinho------------");
         println!("Escolha uma opção:");
-        println!("1) Venda\n2) Estoque\n3) Produto\n0) Sair");
+        println!("1) - Venda\n2) - Estoque\n3) - Produto\n0) - Sair");
 
     
         io::stdin().read_line(&mut opcao).expect("Failed to read line");
