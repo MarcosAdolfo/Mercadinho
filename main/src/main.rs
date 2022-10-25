@@ -26,6 +26,11 @@ impl Produto
     {
         ((self.lucro / 100.0) * self.valor) + self.valor
     }
+
+    fn new_nome(&mut self, nome:String)
+    {
+        self.nome = nome;
+    }
 }
 
 fn new_produto() -> Produto
@@ -188,7 +193,14 @@ fn modifica_produto(produto_biblioteca: &mut HashMap<u16, Produto>)
         match opcao
         {
             0 => break,
-            1 => break,
+            1 => 
+            {
+                println!("Nome:");
+                let mut nome:String = String::new();
+                io::stdin().read_line(&mut nome).expect("Failed to read line");
+                //let nome = nome.to_uppercase();
+                //produto_biblioteca[&chave_produto].new_nome(nome.to_uppercase());
+            },
             2 => break,
             3 => break,
             4 => break,
@@ -251,7 +263,7 @@ fn estoque_interface(produto_biblioteca: &mut HashMap<u16, Produto>)
 fn main()
 {
     //let mut produto_list:Vec<Produto> = Vec::new();
-    let mut produto_biblioteca:HashMap<u16,Produto>= HashMap::new();
+    let mut produto_biblioteca:HashMap<u16,Produto> = HashMap::new();
 
     loop
     {
