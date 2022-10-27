@@ -199,7 +199,9 @@ fn modifica_produto(produto_biblioteca: &mut HashMap<u16, Produto>)
                 let mut nome:String = String::new();
                 io::stdin().read_line(&mut nome).expect("Failed to read line");
                 //let nome = nome.to_uppercase();
-                //produto_biblioteca[&chave_produto].new_nome(nome.to_uppercase());
+                let tss = &mut produto_biblioteca.get(&chave_produto);
+                tss.new_nome(nome).to_uppercase();
+
             },
             2 => break,
             3 => break,
