@@ -17,11 +17,6 @@ struct Produto
 
 impl Produto
 {
-    fn add_estoque(&mut self, valor:u16)
-    {
-        self.estoque += valor;
-    }
-
     fn calc_preco(&self) -> f64
     {
         ((self.lucro / 100.0) * self.valor) + self.valor
@@ -30,6 +25,11 @@ impl Produto
     fn new_nome(&mut self, nome:String)
     {
         self.nome = nome;
+    }
+
+    fn new_estoque(&mut self, valor:u16)
+    {
+        self.estoque = valor;
     }
 }
 
@@ -98,16 +98,16 @@ fn produtos(produto_biblioteca:&mut HashMap<u16, Produto>)
     }
 }
 
-fn listar_produto(produto_biblioteca: &mut HashMap<u16, Produto>)
+fn listar_produto(produto_biblioteca: &HashMap<u16, Produto>)
 {
     let mut num:u16 = 0;
 
     println!("| N° |  ID  |       NOME        | VALOR UNITÁRIO | Margem De Lucro % | PREÇO UNITÁRIO | ESTOQUE |");
     
-    for (_k,p) in produto_biblioteca
+    for produto in produto_biblioteca 
     {
         num += 1;
-        println!("| {}° | {} |    {}    |   R$ {:.2}   |   {}%   |    R$ {:.2}    |  {}  |", num, p.id, p.nome.trim(), p.valor, p.lucro, p.calc_preco(), p.estoque);
+        println!("| {}° | {} |    {}    |   R$ {:.2}   |   {}%   |    R$ {:.2}    |  {}  |", num, produto.1.id, produto.1.nome.trim(), produto.1.valor, produto.1.lucro, produto.1.calc_preco(), produto.1.estoque);
     } 
 }
 
@@ -181,39 +181,44 @@ fn modifica_produto(produto_biblioteca: &mut HashMap<u16, Produto>)
 
     let chave_produto:u16 = buscar_produto(&produto_biblioteca);
 
-    while chave_produto > 0
+    if chave_produto > 0
     {
-        println!("Qual campo gostaria de altera");
-        println!("1) - NOME \n2) - VALOR UNITÁRIO \n3) - Margem De Lucro % \n4) - ESTOQUE \n0) - Sair ");
-
-        let mut opcao = String::new();
-        io::stdin().read_line(&mut opcao).expect("Failed to read line");
-        let opcao:u16 = opcao.trim().parse::<u16>().expect("ERRO: Falha na conversão");
-
-        match opcao
+        //let produto = produto_biblioteca.get(&chave_produto);
+    
+        loop
         {
-            0 => break,
-            1 => 
-            {
-                println!("Nome:");
-                let mut nome:String = String::new();
-                io::stdin().read_line(&mut nome).expect("Failed to read line");
-                //let nome = nome.to_uppercase();
-                let tss = &mut produto_biblioteca.get(&chave_produto);
-                tss.new_nome(nome).to_uppercase();
+            println!("Qual campo gostaria de altera");
+            println!("1) - NOME \n2) - VALOR UNITÁRIO \n3) - Margem De Lucro % \n4) - ESTOQUE \n0) - Sair ");
 
-            },
-            2 => break,
-            3 => break,
-            4 => break,
-            _=> println!("opção invalida!"),
+            let mut opcao = String::new();
+            io::stdin().read_line(&mut opcao).expect("Failed to read line");
+            let opcao:u16 = opcao.trim().parse::<u16>().expect("ERRO: Falha na conversão");
+
+            match opcao
+            {
+                0 => break,
+                1 => 
+                {
+                    println!("Nome:");
+                    let mut nome:String = String::new();
+                    io::stdin().read_line(&mut nome).expect("Failed to read line");
+                    //let nome = nome.to_uppercase();
+                    //let tss = &mut produto_biblioteca.get(&chave_produto);
+                    //tss.new_nome(nome).to_uppercase();
+
+                },
+                2 => break,
+                3 => break,
+                //4 => produto.new_estoque(10),
+                _=> println!("opção invalida!"),
+            }
         }
     }
 }
 
-fn add_estoque_interface(produto_biblioteca: &mut HashMap<u16, Produto>)
+fn new_estoque_interface(produto_biblioteca: &mut HashMap<u16, Produto>, add:bool)
 {
-    println!("\nEscolha um produto para adicionar mais estoque");
+    println!("\nEscolha Um Produto Para Adicionar/Altera O Estoque");
     
     let chave_produto:u16 = buscar_produto(&produto_biblioteca);
 
@@ -230,7 +235,8 @@ fn add_estoque_interface(produto_biblioteca: &mut HashMap<u16, Produto>)
     
         for (k, produto) in produto_biblioteca
         {
-            if k == &chave_produto{produto.add_estoque(valor)}
+            if k == &chave_produto && add{produto.new_estoque(produto.estoque+valor)}
+            else {produto.new_estoque(valor)}
         }
         //produto_biblioteca.get(&chave_produto).expect("ERRO:Falha").add_estoque(valor);
     }
@@ -255,8 +261,8 @@ fn estoque_interface(produto_biblioteca: &mut HashMap<u16, Produto>)
         match opcao
         {
             0 => break,
-            1 => add_estoque_interface(produto_biblioteca),
-            //2 => ,
+            1 => new_estoque_interface(produto_biblioteca, true),
+            2 => new_estoque_interface(produto_biblioteca, false),
             _=>{println!("opção invalida!"); continue},
         }
     }
