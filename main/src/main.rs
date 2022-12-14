@@ -183,8 +183,14 @@ fn modifica_produto(produto_biblioteca: &mut HashMap<u16, Produto>)
 
     if chave_produto > 0
     {
-        //let produto = produto_biblioteca.get(&chave_produto);
-    
+        let produto = produto_biblioteca.get(&chave_produto);
+        
+        let mut produto:Produto = match produto
+        {
+            Some(&produto) => produto,
+            None => todo!(),
+        };
+        
         loop
         {
             println!("Qual campo gostaria de altera");
@@ -209,7 +215,7 @@ fn modifica_produto(produto_biblioteca: &mut HashMap<u16, Produto>)
                 },
                 2 => break,
                 3 => break,
-                //4 => produto.new_estoque(10),
+                4 => produto.new_estoque(10),
                 _=> println!("opção invalida!"),
             }
         }
@@ -232,7 +238,7 @@ fn new_estoque_interface(produto_biblioteca: &mut HashMap<u16, Produto>, add:boo
     
         //let test = produto_biblioteca.get(&chave_produto).expect("ERRO:");
         //test.add_estoque(valor);
-    
+        
         for (k, produto) in produto_biblioteca
         {
             if k == &chave_produto && add{produto.new_estoque(produto.estoque+valor)}
@@ -277,7 +283,9 @@ fn main()
     {
         let mut opcao:String = String::new();
 
-        println!("------------Mercadinho------------");
+        println!("{}","-=".repeat(20));
+
+        println!("{:-^40}", "Mercadinho");
         println!("Escolha uma opção:");
         println!("1) - Venda\n2) - Estoque\n3) - Produto\n0) - Sair");
 
