@@ -24,7 +24,17 @@ impl Produto
 
     fn new_nome(&mut self, nome:String)
     {
-        self.nome = nome;
+        self.nome = nome.to_uppercase();
+    }
+
+    fn new_valor(&mut self, valor:f64)
+    {
+        self.valor = valor;
+    }
+
+    fn new_lucro(&mut self, valor:f64)
+    {
+        self.lucro = valor;
     }
 
     fn new_estoque(&mut self, valor:u16)
@@ -183,13 +193,7 @@ fn modifica_produto(produto_biblioteca: &mut HashMap<u16, Produto>)
 
     if chave_produto > 0
     {
-        let produto = produto_biblioteca.get(&chave_produto);
-        
-        let mut produto:Produto = match produto
-        {
-            Some(&produto) => produto,
-            None => todo!(),
-        };
+        let produto = produto_biblioteca.get_mut(&chave_produto).expect("ERRO!!");
         
         loop
         {
@@ -208,13 +212,10 @@ fn modifica_produto(produto_biblioteca: &mut HashMap<u16, Produto>)
                     println!("Nome:");
                     let mut nome:String = String::new();
                     io::stdin().read_line(&mut nome).expect("Failed to read line");
-                    //let nome = nome.to_uppercase();
-                    //let tss = &mut produto_biblioteca.get(&chave_produto);
-                    //tss.new_nome(nome).to_uppercase();
-
+                    produto.new_nome(nome);
                 },
-                2 => break,
-                3 => break,
+                2 => produto.new_valor(10.0),
+                3 => produto.new_lucro(10.0),
                 4 => produto.new_estoque(10),
                 _=> println!("opção invalida!"),
             }
@@ -222,7 +223,7 @@ fn modifica_produto(produto_biblioteca: &mut HashMap<u16, Produto>)
     }
 }
 
-fn new_estoque_interface(produto_biblioteca: &mut HashMap<u16, Produto>, add:bool)
+fn new_estoque_interface(produto_biblioteca: &mut HashMap<u16, Produto>, add_estoque:bool) 
 {
     println!("\nEscolha Um Produto Para Adicionar/Altera O Estoque");
     
@@ -235,16 +236,20 @@ fn new_estoque_interface(produto_biblioteca: &mut HashMap<u16, Produto>, add:boo
         let mut valor = String::new();
         io::stdin().read_line(&mut valor).expect("Failed to read line");
         let valor:u16 = valor.trim().parse::<u16>().expect("ERRO: Falha na conversão");
-    
-        //let test = produto_biblioteca.get(&chave_produto).expect("ERRO:");
-        //test.add_estoque(valor);
-        
+
+        let produto = produto_biblioteca.get_mut(&chave_produto).expect("ERRO!");
+
+        if add_estoque { produto.new_estoque(produto.estoque + valor); }
+        else { produto.new_estoque(valor); }
+
+        //add ? produto.new_estoque(produto.estoque + valor) : produto.new_estoque(valor);
+        /*
         for (k, produto) in produto_biblioteca
         {
             if k == &chave_produto && add{produto.new_estoque(produto.estoque+valor)}
             else {produto.new_estoque(valor)}
         }
-        //produto_biblioteca.get(&chave_produto).expect("ERRO:Falha").add_estoque(valor);
+        */
     }
 }
 
