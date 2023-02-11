@@ -123,6 +123,8 @@ fn listar_produto(produto_biblioteca: &HashMap<u16, Produto>)
 
 fn buscar_produto(produto_biblioteca: &HashMap<u16, Produto>) -> u16
 {
+    if produto_biblioteca.len() == 0 {return 0}
+
     println!("Pesquisa por Produtos - ( 0 ) Para Sair");
 
     loop
@@ -164,7 +166,7 @@ fn buscar_produto(produto_biblioteca: &HashMap<u16, Produto>) -> u16
             }
         }
     
-        if resut_pesquisa.len() > 0
+        if resut_pesquisa.len() > 1
         {
             loop 
             {
@@ -178,18 +180,32 @@ fn buscar_produto(produto_biblioteca: &HashMap<u16, Produto>) -> u16
                 {
                     return resut_pesquisa[opcao_pesquisa-1]
                 }
+
                 else if opcao_pesquisa == 0 {break;}
+
                 else{println!("\nOpção Invalida!\nDigite Novamente.");}
             }
-        }else{println!("\nProduto não encontrado!!!\n");}
+        }
+
+        else if resut_pesquisa.len() == 1 {return resut_pesquisa[0];}
+
+        else{println!("\nProduto não encontrado!!!\n");}
     }
 }
 
 fn modifica_produto(produto_biblioteca: &mut HashMap<u16, Produto>)
 {
-    println!("\nEscolha um produto para Modifica");
-
-    let chave_produto:u16 = buscar_produto(&produto_biblioteca);
+    let mut chave_produto = 0;
+    
+    if produto_biblioteca.len() == 1
+    {
+        chave_produto = *produto_biblioteca.keys().next().unwrap();
+    }
+    else if produto_biblioteca.len() > 1
+    {
+        println!("\nEscolha um produto para Modifica");   
+        chave_produto = buscar_produto(&produto_biblioteca);
+    }
 
     if chave_produto > 0
     {
@@ -197,26 +213,50 @@ fn modifica_produto(produto_biblioteca: &mut HashMap<u16, Produto>)
         
         loop
         {
+            println!("\n----[ {} ]----",produto.nome.trim());
+            println!("| Nome: {} - Valor Unitário: R${:.2} - Margem De Lucro %: {:.2}% - Estoque: {} |\n",produto.nome.trim(), produto.valor, produto.lucro, produto.estoque);
+
             println!("Qual campo gostaria de altera");
-            println!("1) - NOME \n2) - VALOR UNITÁRIO \n3) - Margem De Lucro % \n4) - ESTOQUE \n0) - Sair ");
+            println!("1) - NOME \n2) - VALOR UNITÁRIO \n3) - MARGEM DE LUCRO % \n4) - ESTOQUE \n0) - Sair ");
 
             let mut opcao = String::new();
             io::stdin().read_line(&mut opcao).expect("Failed to read line");
             let opcao:u16 = opcao.trim().parse::<u16>().expect("ERRO: Falha na conversão");
-
+            
             match opcao
             {
                 0 => break,
                 1 => 
                 {
-                    println!("Nome:");
+                    println!("Novo Nome:");
                     let mut nome:String = String::new();
                     io::stdin().read_line(&mut nome).expect("Failed to read line");
                     produto.new_nome(nome);
                 },
-                2 => produto.new_valor(10.0),
-                3 => produto.new_lucro(10.0),
-                4 => produto.new_estoque(10),
+                2 => 
+                {
+                    println!("Novo VALOR UNITÁRIO:");
+                    let mut valor:String = String::new();
+                    io::stdin().read_line(&mut valor).expect("Failed to read line");
+                    let valor = valor.trim().parse::<f64>().expect("ERRO! de conversão");
+                    produto.new_valor(valor)
+                },
+                3 => 
+                {
+                    println!("Novo Margem De Lucro %:");
+                    let mut valor:String = String::new();
+                    io::stdin().read_line(&mut valor).expect("ERRO!");
+                    let valor = valor.trim().parse::<f64>().expect("ERRO! na conversão");
+                    produto.new_lucro(valor)
+                },
+                4 => 
+                {
+                    println!("Novo ESTOQUE:");
+                    let mut valor:String = String::new();
+                    io::stdin().read_line(&mut valor).expect("ERRO!");
+                    let valor = valor.trim().parse::<u16>().expect("ERRO! na conversão");
+                    produto.new_estoque(valor)
+                },
                 _=> println!("opção invalida!"),
             }
         }
@@ -225,19 +265,29 @@ fn modifica_produto(produto_biblioteca: &mut HashMap<u16, Produto>)
 
 fn new_estoque_interface(produto_biblioteca: &mut HashMap<u16, Produto>, add_estoque:bool) 
 {
-    println!("\nEscolha Um Produto Para Adicionar/Altera O Estoque");
-    
-    let chave_produto:u16 = buscar_produto(&produto_biblioteca);
+    let mut chave_produto = 0;
+
+    if produto_biblioteca.len() == 1
+    {
+        chave_produto = *produto_biblioteca.keys().next().unwrap();
+    }
+    else if produto_biblioteca.len() > 1
+    {
+        println!("\nEscolha Um Produto Para Adicionar/Altera O Estoque");
+        chave_produto = buscar_produto(&produto_biblioteca);
+    }
 
     if chave_produto > 0
     {
+        let produto = produto_biblioteca.get_mut(&chave_produto).expect("ERRO!");
+
+        println!("\n----[ {} ]----",produto.nome.trim());
+        println!("| Nome: {} - Estoque: {}.Unt |\n",produto.nome.trim(), produto.estoque);
         println!("\nValor:");
 
         let mut valor = String::new();
         io::stdin().read_line(&mut valor).expect("Failed to read line");
         let valor:u16 = valor.trim().parse::<u16>().expect("ERRO: Falha na conversão");
-
-        let produto = produto_biblioteca.get_mut(&chave_produto).expect("ERRO!");
 
         if add_estoque { produto.new_estoque(produto.estoque + valor); }
         else { produto.new_estoque(valor); }
